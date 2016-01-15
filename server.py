@@ -32,7 +32,8 @@ class MyWebServer(SocketServer.BaseRequestHandler):
 
     def __init__(self, request, client_address, server):
         self.response_200 = "HTTP/1.1 200 OK\r\n"
-        self.response_404 = "HTTP/1.1 404 Not Found\r\n"
+        self.response_404 = "HTTP/1.1 404 Not Found\r\n\r\n404: Page " + \
+                            "Not Found"
         SocketServer.BaseRequestHandler.__init__(self, request,
                                                  client_address, server)
 
@@ -40,26 +41,43 @@ class MyWebServer(SocketServer.BaseRequestHandler):
         self.data = self.request.recv(1024).strip()
         #print ("Got a request of: %s\n" % self.data)
 
+        # process request text
         formatted = self.data.split("\r\n")
         self.print_request(formatted)
 
         path = formatted[0].split(" ")[1]
-            
-        if (path == "/"):
-            self.request.sendall(self.response_200)
-            return
-
         root_path = os.getcwd() + "/www"
 
-        if (not os.path.isfile(root_path+path)):
+        # check root dir
+        if (path == "/"):
+            if (os.path.isfile(root_path+"/index.html")):
+                self.add_file("/index.html")
+                self.request.sendall(self.response_200)
+            # if root index.html does not exist
+            else:
+                self.request.sendall(self.response_404)
+        elif (path[-1] == "/"): # directory
+            # check if directory exists
+            if (os.path.isdir(root_path+path)):
+                # if index.html exists
+                if (os.path.isfile(root_path+path+"index.html")):
+                    self.add_file(path+"index.html")
+                    self.request.sendall(self.response_200)
+                else:
+                    self.request.sendall(self.response_200)
+            else:
+                self.request.sendall(self.response_404)
+        # a directory but does not end in '/'
+        elif (os.path.isdir(root_path+path)):
             self.request.sendall(self.response_404)
-            return
-        #os.direxists("path")
-        elif (path == "/index.html"):
-            self.add_file(path)
-            self.request.sendall(self.response_200)
-        else:
-            self.request.sendall(self.response_200)
+        else: # regular file
+            if (os.path.isfile(root_path+path)):
+                self.add_file(path)
+                self.request.sendall(self.response_200)
+            else:
+                self.request.sendall(self.response_404)
+
+        return
         
     def add_file(self, file_path):
         root_path = os.getcwd() + "/www"
@@ -77,7 +95,8 @@ class MyWebServer(SocketServer.BaseRequestHandler):
         print "New request:"
         for line in request_str:
             print line
-
+        print "\n"
+        
         return
 
 if __name__ == "__main__":
