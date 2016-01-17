@@ -48,6 +48,18 @@ class MyWebServer(SocketServer.BaseRequestHandler):
         path = formatted[0].split(" ")[1]
         root_path = os.getcwd() + "/www"
 
+        print ("PATH: %s" % path)
+        print ("REAL PATH: %s" % os.path.realpath(root_path+path))
+        real_path = os.path.realpath(root_path+path)
+
+        if (real_path == root_path):
+            path = "/"
+        elif (real_path.startswith(root_path+"/")):
+            # get relative path to /www/ from given path
+            path = real_path.split(root_path)[1]
+        else: # invalid path
+            return self.request.sendall(self.response_404)
+        
         # check root dir
         if (path == "/"):
             if (os.path.isfile(root_path+"/index.html")):
@@ -69,21 +81,34 @@ class MyWebServer(SocketServer.BaseRequestHandler):
                 self.request.sendall(self.response_404)
         # a directory but does not end in '/'
         elif (os.path.isdir(root_path+path)):
+            """ What to do with this? """
             self.request.sendall(self.response_404)
         else: # regular file
             if (os.path.isfile(root_path+path)):
-                self.add_file(path)
-                self.request.sendall(self.response_200)
+                # path is not within /www/
+                if (not os.path.realpath(root_path+path).startswith(
+                        root_path)):
+                    self.request.sendall(self.response_404)
+                else:
+                    self.add_file(path)
+                    self.request.sendall(self.response_200)
             else:
                 self.request.sendall(self.response_404)
 
         return
-        
+    
     def add_file(self, file_path):
+        # handle css and html files
+        # HERE
+        if (file_path.endswith(".css")):
+            self.response_200 += "Content-Type: text/css\r\n"
+        elif (file_path.endswith(".html")):
+            self.response_200 += "Content-Type: text/html\r\n"
+            
         root_path = os.getcwd() + "/www"
         file0 = open(root_path+file_path, "r")
 
-        self.response_200 += "\n"
+        self.response_200 += "\r\n" # add a '\r'?
         for line in file0:
             line = line.strip("\n")
             self.response_200 += line+"\r\n"
