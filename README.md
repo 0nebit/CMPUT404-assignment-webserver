@@ -24,10 +24,11 @@ Software Foundation; All Rights Reserved under the PSF license (GPL
 compatible) http://docs.python.org/2/library/socketserver.html
 
 ## References
-- https://pymotw.com/2/SocketServer/
-- http://www.ibm.com/developerworks/linux/tutorials/l-pysocks/
-- http://fragments.turtlemeat.com/pythonwebserver.php
-- https://www.junian.net/2014/07/simple-http-server-and-client-in-python.html
-- https://www.ntu.edu.sg/home/ehchua/programming/webprogramming/HTTP_Basics.html
-- http://code.tutsplus.com/tutorials/http-headers-for-dummies--net-8039
-- http://www.tutorialspoint.com/http/http_responses.htm
+- Chuan Chen
+  - https://pymotw.com/2/SocketServer/
+  - http://www.ibm.com/developerworks/linux/tutorials/l-pysocks/
+  - http://fragments.turtlemeat.com/pythonwebserver.php
+  - https://www.junian.net/2014/07/simple-http-server-and-client-in-python.html
+  - https://www.ntu.edu.sg/home/ehchua/programming/webprogramming/HTTP_Basics.html
+  - http://code.tutsplus.com/tutorials/http-headers-for-dummies--net-8039
+  - http://www.tutorialspoint.com/http/http_responses.htm
