@@ -32,8 +32,21 @@ class MyWebServer(SocketServer.BaseRequestHandler):
 
     def __init__(self, request, client_address, server):
         self.response_200 = "HTTP/1.1 200 OK\r\n"
-        self.response_404 = "HTTP/1.1 404 Not Found\r\n\r\n404: Page " + \
-                            "Not Found"
+        self.response_404 = \
+        "HTTP/1.1 404 Not Found\r\n" \
+        "Content-Type: text/html\r\n" \
+        "\r\n" \
+        "<!DOCTYPE html>\r\n" \
+        "<html>\r\n" \
+        "<head>\r\n" \
+        "<title>404: Page Not Found</title>\r\n" \
+        "</head>\r\n" \
+        "<body>\r\n" \
+        "<div>\r\n" \
+        "<p>404: Page Not Found</p>\r\n" \
+        "</div>\r\n" \
+        "</body>\r\n" \
+        "</html>\r\n"
         SocketServer.BaseRequestHandler.__init__(self, request,
                                                  client_address, server)
 
@@ -58,15 +71,14 @@ class MyWebServer(SocketServer.BaseRequestHandler):
         else: # invalid path
             return self.request.sendall(self.response_404)
         
-        #print ("REAL PATH 2: %s" % real_path)
-        print ("PATH 2: %s" % path)
+        #print ("REAL PATH: %s" % real_path)
+        #print ("PATH: %s" % path)
         
         # check root dir
         if (path == "/"):
             if (os.path.isfile(root_path+"/index.html")):
                 self.add_file("/index.html")
                 self.request.sendall(self.response_200)
-            # if root index.html does not exist
             else:
                 self.request.sendall(self.response_404)
         elif (os.path.isdir(root_path+path)): # valid directory
@@ -87,7 +99,7 @@ class MyWebServer(SocketServer.BaseRequestHandler):
 
     # assumes file_path starts with '/'
     def add_file(self, file_path):
-        # handle css and html files
+        # handle html and css files
         if (file_path.endswith(".css")):
             self.response_200 += "Content-Type: text/css\r\n"
         elif (file_path.endswith(".html")):
@@ -122,4 +134,3 @@ if __name__ == "__main__":
     # Activate the server; this will keep running until you
     # interrupt the program with Ctrl-C
     server.serve_forever()
-# a
